@@ -1,0 +1,11 @@
+# Environment variables
+.env
+*.env
+
+# Test file
+test.py
+
+# SQLite databases
+*.sqlite
+*.sqlite3
+*.db
