@@ -7,6 +7,7 @@ load_dotenv()
 
 SHEETY_API_KEY = os.environ["SHEETY_API_KEY"]
 SERP_API_KEY = os.environ["SERP_API_KEY"]
+SHEETY_ID = os.environ["SHEETY_ID"]
 
 class DataManager:
     #This class is responsible for talking to the Google Sheet.
@@ -15,7 +16,7 @@ class DataManager:
         self.session = session
 
     def get_flight_data(self): # SHEETY API CALL
-        url = "https://api.sheety.co/16e5ddb843d4b041658adc1425494e72/flightDeals/flightDeals"
+        url = f"https://api.sheety.co/{SHEETY_ID}/flightDeals/flightDeals"
 
         header = {
             "Authorization": f"Bearer {SHEETY_API_KEY}"
@@ -66,7 +67,7 @@ class DataManager:
             flight["flights"][-1]["arrival_airport"]["id"] == self.flight_data["flightDeals"][index]["destinationId"] and
             flight["flights"][0]["departure_airport"]["time"][:10] == self.flight_data["flightDeals"][index]["departureDate"]) :
 
-                url = f"https://api.sheety.co/16e5ddb843d4b041658adc1425494e72/flightDeals/flightDeals/{self.flight_data['flightDeals'][index]['id']}"
+                url = f"https://api.sheety.co/{SHEETY_ID}/flightDeals/flightDeals/{self.flight_data['flightDeals'][index]['id']}"
 
                 header = {
                     "Authorization": f"Bearer {SHEETY_API_KEY}"

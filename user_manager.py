@@ -7,6 +7,7 @@ load_dotenv()
 
 SHEETY_API_KEY = os.environ["SHEETY_API_KEY"]
 SERP_API_KEY = os.environ["SERP_API_KEY"]
+SHEETY_ID = os.environ["SHEETY_ID"]
 
 class UserManager:
     # This class is responsible for the management users: getting new user inputs, creating new users, and getting user data.
@@ -29,7 +30,7 @@ class UserManager:
         # Method that adds the row of the new user into the users sheet through the Sheety API.
         print("Creating user in Google Sheets...")
 
-        url = "https://api.sheety.co/16e5ddb843d4b041658adc1425494e72/flightDeals/users"
+        url = f"https://api.sheety.co/{SHEETY_ID}/flightDeals/users"
 
         header = {
             "Authorization": f"Bearer {SHEETY_API_KEY}"
@@ -49,7 +50,7 @@ class UserManager:
 
     def get_user_data(self):
         # Method that gets the user data and returns it as a dictionary.
-        url = "https://api.sheety.co/16e5ddb843d4b041658adc1425494e72/flightDeals/users"
+        url = f"https://api.sheety.co/{SHEETY_ID}/flightDeals/users"
 
         header = {
             "Authorization": f"Bearer {SHEETY_API_KEY}"
