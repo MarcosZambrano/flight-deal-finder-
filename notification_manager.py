@@ -2,6 +2,7 @@ import os
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
+import time
 
 SENDER_EMAIL = os.getenv("EMAIL")
 SENDER_PASSWORD = os.getenv("APP_PASSWORD")
@@ -13,7 +14,7 @@ class NotificationManager:
         self.subject = ""
         self.content = ""
         
-    def send_emails(self, flights_sync, current_data):
+    def send_emails(self, flights_sync, current_data, users_data):
         # Strict Guard Clause
         print(f"CURRENT DATA FROM EMAIL NOTIFICATION MANAGER")
         print(current_data)
@@ -31,26 +32,27 @@ class NotificationManager:
                 index = 0
 
                 for flight in flights_sync:
-                    
-                    
-                    content = f"Low price alert! This is cheaper than your target price.\n\n{current_data[index]["departureCity"]} ({flight["flights"][0]["departure_airport"]["id"]}) → {current_data[index]["destinationCity"]} ({flight["flights"][-1]["arrival_airport"]["id"]})\n\nDeparture: {flight["flights"][0]["departure_airport"]["time"][:10]} at {flight["flights"][0]["departure_airport"]["time"][11:16]}\nReturn: {current_data[index]["returnDate"]}\n\nNew price: €{flight["price"]}\n\nEmail sent from your Flight Deal Finder"
+                    for user in users_data["users"]:
+                        
+                        content = f"Low price alert! This is cheaper than your target price.\n\n{current_data[index]["departureCity"]} ({flight["flights"][0]["departure_airport"]["id"]}) → {current_data[index]["destinationCity"]} ({flight["flights"][-1]["arrival_airport"]["id"]})\n\nDeparture: {flight["flights"][0]["departure_airport"]["time"][:10]} at {flight["flights"][0]["departure_airport"]["time"][11:16]}\nReturn: {current_data[index]["returnDate"]}\n\nNew price: €{flight["price"]}\n\nEmail sent from your Flight Deal Finder"
 
-                    # Content structural generation
-                    msg = EmailMessage()
-                    msg["Subject"] = f"✈️ Flight Deal Alert: {current_data[index]["departureCity"]} → {current_data[index]["destinationCity"]} for €{flight["price"]}!"
-                    msg["From"] = SENDER_EMAIL
-                    msg["To"] = "marcos.d.zambrano@gmail.com"
-                    msg.set_content(content)
+                        # Content structural generation
+                        msg = EmailMessage()
+                        msg["Subject"] = f"✈️ {user["firstName"]}! You have a Flight Deal Alert: {current_data[index]["departureCity"]} → {current_data[index]["destinationCity"]} for €{flight["price"]}!"
+                        msg["From"] = SENDER_EMAIL
+                        msg["To"] = f"{user["email"]}"
+                        msg.set_content(content)
 
-                    # Single message transmission payload dispatch
-                    try:
-                        connection.send_message(msg)
-                        print(f"[SUCCESS] Dispatched delivery of new flight deal notification to marcos.d.zambrano@gmail.com")
-                    except smtplib.SMTPException as recipient_err:
-                        print(f"[DELIVERY FAILURE] Error sending email: {type(recipient_err).__name__} - {recipient_err}")
-                        continue
+                        # Single message transmission payload dispatch
+                        try:
+                            connection.send_message(msg)
+                            print(f"[SUCCESS] Dispatched delivery of new flight deal notification to {user["email"]}")
+                        except smtplib.SMTPException as recipient_err:
+                            print(f"[DELIVERY FAILURE] Error sending email: {type(recipient_err).__name__} - {recipient_err}")
+                            continue
 
                     index = index + 1
+                    time.sleep(5)
 
         except smtplib.SMTPAuthenticationError:
             print("[AUTHENTICATION CRITICAL] SMTP Gateway denied credentials. Verify your App Password settings.")
